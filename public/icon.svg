@@ -1,0 +1,35 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5b93ff"/>
+      <stop offset="1" stop-color="#2f6bf0"/>
+    </linearGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffe37a"/>
+      <stop offset="1" stop-color="#ffce3f"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="512" height="512" rx="114" fill="url(#bg)"/>
+  <!-- sun -->
+  <g transform="translate(336,176)">
+    <g stroke="url(#sun)" stroke-width="15" stroke-linecap="round">
+      <line x1="0" y1="-70" x2="0" y2="-52"/>
+      <line x1="49" y1="-49" x2="37" y2="-37"/>
+      <line x1="70" y1="0" x2="52" y2="0"/>
+      <line x1="49" y1="49" x2="37" y2="37"/>
+      <line x1="-49" y1="-49" x2="-37" y2="-37"/>
+    </g>
+    <circle r="40" fill="url(#sun)"/>
+  </g>
+  <!-- rising forecast line -->
+  <polyline points="86,388 176,326 250,352 330,268 430,196"
+    fill="none" stroke="#ffffff" stroke-width="26" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- points -->
+  <g fill="#ffffff">
+    <circle cx="86" cy="388" r="17"/>
+    <circle cx="176" cy="326" r="17"/>
+    <circle cx="250" cy="352" r="17"/>
+    <circle cx="330" cy="268" r="17"/>
+    <circle cx="430" cy="196" r="17"/>
+  </g>
+</svg>
