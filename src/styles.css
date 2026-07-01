@@ -72,7 +72,7 @@ html, body {
 }
 
 /* ---------- Header ---------- */
-.header { padding-top: 22px; }
+.header { padding-top: 14px; }
 .menu-btn {
   display: flex; flex-direction: column; gap: 4px;
   width: 26px; height: 22px; padding: 0; justify-content: center;
@@ -83,12 +83,12 @@ html, body {
 
 .header-row {
   display: flex; align-items: flex-start; justify-content: space-between;
-  margin-top: 14px; gap: 12px;
+  margin-top: 8px; gap: 12px;
 }
-.title { font-size: 30px; font-weight: 800; letter-spacing: -0.5px; margin: 0; }
-.subtitle { color: var(--muted); font-size: 16px; margin: 2px 0 0; }
-.balance { text-align: right; padding-top: 4px; }
-.balance-amount { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+.title { font-size: 25px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; margin: 0; }
+.subtitle { color: var(--muted); font-size: 15px; margin: 2px 0 0; }
+.balance { text-align: right; padding-top: 2px; flex-shrink: 0; }
+.balance-amount { font-size: 23px; font-weight: 800; letter-spacing: -0.5px; }
 .balance-updated { color: var(--muted); font-size: 12px; margin-top: 2px; }
 
 /* ---------- Weather banner ---------- */
@@ -107,6 +107,18 @@ html, body {
 .weather.storm  { background: var(--red-bg);   color: var(--red-ink); }
 .weather.cloudy { background: var(--blue-bg);  color: var(--blue-ink); }
 .weather.clear  { background: var(--green-bg); color: var(--green-ink); }
+
+/* ---------- Sparkline ---------- */
+.sparkline {
+  margin: 10px 2px 0; height: 60px;
+  border-radius: 12px; overflow: hidden;
+}
+.sparkline-svg { display: block; width: 100%; height: 60px; }
+.sparkline.storm  { color: var(--red-ink); }
+.sparkline.cloudy { color: var(--blue-ink); }
+.sparkline.clear  { color: var(--green-ink); }
+.spark-zero { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0.6; }
+.spark-dot { fill: var(--bg); stroke: currentColor; stroke-width: 2; }
 
 /* ---------- Calendar ---------- */
 .cal-nav {
@@ -131,7 +143,7 @@ html, body {
 
 .cal-cell {
   background: none; border: none; text-align: left; cursor: pointer;
-  min-height: 62px; padding: 4px 3px 6px; border-top: 1px solid var(--line);
+  min-height: 62px; min-width: 0; padding: 4px 2px 6px; border-top: 1px solid var(--line);
   display: flex; flex-direction: column; align-items: stretch; gap: 3px;
   font: inherit; color: inherit; border-radius: 6px;
 }
@@ -150,14 +162,18 @@ html, body {
 
 .cell-balance {
   align-self: center; background: var(--pill-bg); color: var(--pill-ink);
-  font-size: 11px; font-weight: 700; border-radius: 10px; padding: 1px 7px;
+  font-size: 10px; font-weight: 700; border-radius: 10px; padding: 1px 4px;
+  letter-spacing: -0.3px; max-width: 100%; overflow: hidden;
+  text-overflow: ellipsis; white-space: nowrap;
 }
-.cell-txs { display: flex; flex-direction: column; gap: 3px; }
+.cell-balance.negative { background: var(--red-bg); color: var(--red-ink); }
+.cell-txs { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 
 .chip {
   border-radius: 8px; padding: 3px 4px; display: flex; flex-direction: column;
-  line-height: 1.15; min-width: 0;
+  line-height: 1.15; min-width: 0; overflow: hidden;
 }
+.chip-amt, .cell-num { min-width: 0; }
 .chip-emoji { font-size: 13px; }
 .chip-label {
   font-size: 10.5px; font-weight: 700; white-space: nowrap;

@@ -41,6 +41,11 @@ export default function Calendar({ viewMonth, onChangeMonth, today, forecast, se
           const isToday = key === todayKey
           const isSelected = key === selectedKey
           const entry = forecast.get(key)
+          const hasTx = entry && entry.transactions.length > 0
+          // Only surface the running-balance pill where money actually moves
+          // (plus today), so quiet days don't repeat the same number down the grid.
+          const showBalance = entry && (hasTx || isToday)
+          const negative = entry && entry.balance < 0
           return (
             <button
               key={key}
@@ -53,7 +58,11 @@ export default function Calendar({ viewMonth, onChangeMonth, today, forecast, se
               onClick={() => onSelect(key)}
             >
               <div className="cell-num">{date.getDate() === 1 ? shortDate(date) : date.getDate()}</div>
-              {entry && <div className="cell-balance">{formatShort(entry.balance)}</div>}
+              {showBalance && (
+                <div className={'cell-balance' + (negative ? ' negative' : '')}>
+                  {formatShort(entry.balance)}
+                </div>
+              )}
               <div className="cell-txs">
                 {entry?.transactions.map((tx) => {
                   const cat = CATEGORIES[tx.category] || CATEGORIES.other

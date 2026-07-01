@@ -11,6 +11,7 @@ import DaySheet from './components/DaySheet.jsx'
 import TransactionModal from './components/TransactionModal.jsx'
 import Menu from './components/Menu.jsx'
 import Onboarding from './components/Onboarding.jsx'
+import Sparkline from './components/Sparkline.jsx'
 
 const FORECAST_DAYS = 120
 
@@ -44,6 +45,7 @@ export default function App() {
     [state.balance, state.transactions, today]
   )
   const weather = useMemo(() => weatherFor(forecast), [forecast])
+  const sparkSeries = useMemo(() => [...forecast.values()].slice(0, 45), [forecast])
 
   function completeOnboarding({ balance, withSample }) {
     setState({
@@ -113,6 +115,8 @@ export default function App() {
       />
 
       <WeatherBanner weather={weather} onEdit={() => setMenuOpen(true)} />
+
+      <Sparkline series={sparkSeries} kind={weather.kind} />
 
       <Calendar
         viewMonth={viewMonth}
