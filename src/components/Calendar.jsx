@@ -67,7 +67,7 @@ export default function Calendar({ viewMonth, onChangeMonth, today, forecast, se
                 {entry?.transactions.map((tx) => {
                   const cat = CATEGORIES[tx.category] || CATEGORIES.other
                   return (
-                    <div key={tx.id} className={`chip cat-${cat.color}`}>
+                    <div key={tx.id} className={`chip cat-${cat.color}${tx.amount >= 0 ? ' income' : ''}`}>
                       <span className="chip-emoji">{cat.emoji}</span>
                       <span className="chip-label">{tx.label || cat.label}</span>
                       <span className="chip-amt">{formatSigned(tx.amount)}</span>

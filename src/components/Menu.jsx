@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { CATEGORIES, RECURRENCE } from '../lib/categories.js'
 import { formatSigned } from '../lib/format.js'
+import { isStandalone } from '../lib/platform.js'
 
 export default function Menu({
-  state, onClose, onSetBalance, onEditTx, onDeleteTx, onExport, onImport, onReset,
+  state, onClose, onSetBalance, onEditTx, onDeleteTx, onExport, onImport, onInstall, onReset,
 }) {
   const [draft, setDraft] = useState(String(state.balance))
 
@@ -69,6 +70,13 @@ export default function Menu({
             )
           })}
         </div>
+
+        {!isStandalone() && (
+          <>
+            <div className="drawer-section-title">App</div>
+            <button className="btn-ghost btn-block" onClick={onInstall}>📲 Add to Home Screen</button>
+          </>
+        )}
 
         <div className="drawer-section-title">Backup</div>
         <div className="drawer-actions">

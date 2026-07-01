@@ -1,8 +1,19 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
+import InstallGuide from './InstallGuide.jsx'
+import { isStandalone } from '../lib/platform.js'
 
 export default function Onboarding({ onComplete }) {
-  const [step, setStep] = useState(0)
+  // Skip the install step if we're already running as an installed app.
+  const steps = useMemo(
+    () => ['welcome', 'balance', ...(isStandalone() ? [] : ['install']), 'start'],
+    []
+  )
+  const [i, setI] = useState(0)
   const [balance, setBalance] = useState('')
+  const step = steps[i]
+
+  const next = () => setI((n) => Math.min(n + 1, steps.length - 1))
+  const back = () => setI((n) => Math.max(n - 1, 0))
 
   function finish(withSample) {
     const value = parseFloat(balance)
@@ -11,12 +22,11 @@ export default function Onboarding({ onComplete }) {
 
   return (
     <div className="onboard">
-      {step > 0 && (
-        <button className="onboard-back" onClick={() => setStep(step - 1)} aria-label="Go back">
-          ‹ Back
-        </button>
+      {i > 0 && (
+        <button className="onboard-back" onClick={back} aria-label="Go back">‹ Back</button>
       )}
-      {step === 0 && (
+
+      {step === 'welcome' && (
         <div className="onboard-card">
           <div className="onboard-hero">🌤️</div>
           <h1 className="onboard-title">Financial Forecast</h1>
@@ -24,13 +34,11 @@ export default function Onboarding({ onComplete }) {
             See your balance days and weeks ahead. Schedule the money you know is coming
             and going, and we'll forecast the weather — clear skies or a storm warning.
           </p>
-          <button className="btn-primary onboard-btn" onClick={() => setStep(1)}>
-            Get started
-          </button>
+          <button className="btn-primary onboard-btn" onClick={next}>Get started</button>
         </div>
       )}
 
-      {step === 1 && (
+      {step === 'balance' && (
         <div className="onboard-card">
           <div className="onboard-hero">💵</div>
           <h1 className="onboard-title">What's your balance today?</h1>
@@ -47,20 +55,26 @@ export default function Onboarding({ onComplete }) {
               placeholder="0.00"
               onChange={(e) => setBalance(e.target.value)}
               autoFocus
-              onKeyDown={(e) => e.key === 'Enter' && balance !== '' && setStep(2)}
+              onKeyDown={(e) => e.key === 'Enter' && balance !== '' && next()}
             />
           </div>
-          <button
-            className="btn-primary onboard-btn"
-            disabled={balance === ''}
-            onClick={() => setStep(2)}
-          >
+          <button className="btn-primary onboard-btn" disabled={balance === ''} onClick={next}>
             Continue
           </button>
         </div>
       )}
 
-      {step === 2 && (
+      {step === 'install' && (
+        <div className="onboard-card">
+          <div className="onboard-hero">📲</div>
+          <h1 className="onboard-title">Add it to your home screen</h1>
+          <InstallGuide />
+          <button className="btn-primary onboard-btn" onClick={next}>Continue</button>
+          <button className="btn-ghost onboard-btn" onClick={next}>Maybe later</button>
+        </div>
+      )}
+
+      {step === 'start' && (
         <div className="onboard-card">
           <div className="onboard-hero">📅</div>
           <h1 className="onboard-title">How do you want to start?</h1>
@@ -77,8 +91,8 @@ export default function Onboarding({ onComplete }) {
       )}
 
       <div className="onboard-dots">
-        {[0, 1, 2].map((i) => (
-          <span key={i} className={'dot-tick' + (i === step ? ' on' : '')} />
+        {steps.map((_, idx) => (
+          <span key={idx} className={'dot-tick' + (idx === i ? ' on' : '')} />
         ))}
       </div>
     </div>

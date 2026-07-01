@@ -12,6 +12,8 @@ import TransactionModal from './components/TransactionModal.jsx'
 import Menu from './components/Menu.jsx'
 import Onboarding from './components/Onboarding.jsx'
 import Sparkline from './components/Sparkline.jsx'
+import Agenda from './components/Agenda.jsx'
+import InstallGuide from './components/InstallGuide.jsx'
 
 const FORECAST_DAYS = 120
 
@@ -24,6 +26,8 @@ export default function App() {
   const [sheetOpen, setSheetOpen] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [editing, setEditing] = useState(null) // null = closed, {} = new, tx = edit
+  const [view, setView] = useState('calendar') // 'calendar' | 'agenda'
+  const [installOpen, setInstallOpen] = useState(false)
   const importRef = useRef(null)
 
   useEffect(() => saveState(state), [state])
@@ -32,13 +36,14 @@ export default function App() {
   useEffect(() => {
     function onKey(e) {
       if (e.key !== 'Escape') return
-      if (editing) setEditing(null)
+      if (installOpen) setInstallOpen(false)
+      else if (editing) setEditing(null)
       else if (sheetOpen) setSheetOpen(false)
       else if (menuOpen) setMenuOpen(false)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [editing, sheetOpen, menuOpen])
+  }, [editing, sheetOpen, menuOpen, installOpen])
 
   const forecast = useMemo(
     () => buildForecast(state.balance, today, state.transactions, FORECAST_DAYS),
@@ -110,26 +115,49 @@ export default function App() {
       <Header
         today={today}
         balance={state.balance}
-        updatedAt={state.updatedAt}
         onMenu={() => setMenuOpen(true)}
+        onEditBalance={() => setMenuOpen(true)}
       />
 
-      <WeatherBanner weather={weather} onEdit={() => setMenuOpen(true)} />
+      <WeatherBanner key={weather.kind} weather={weather} onEdit={() => setMenuOpen(true)} />
 
       <Sparkline series={sparkSeries} kind={weather.kind} />
 
-      <Calendar
-        viewMonth={viewMonth}
-        onChangeMonth={setViewMonth}
-        today={today}
-        forecast={forecast}
-        selectedKey={selectedKey}
-        onSelect={(key) => {
-          setSelectedKey(key)
-          setSheetOpen(true)
-        }}
-        onToday={goToToday}
-      />
+      <div className="view-toggle" role="tablist">
+        <button
+          role="tab"
+          aria-selected={view === 'calendar'}
+          className={view === 'calendar' ? 'active' : ''}
+          onClick={() => setView('calendar')}
+        >
+          Calendar
+        </button>
+        <button
+          role="tab"
+          aria-selected={view === 'agenda'}
+          className={view === 'agenda' ? 'active' : ''}
+          onClick={() => setView('agenda')}
+        >
+          Upcoming
+        </button>
+      </div>
+
+      {view === 'calendar' ? (
+        <Calendar
+          viewMonth={viewMonth}
+          onChangeMonth={setViewMonth}
+          today={today}
+          forecast={forecast}
+          selectedKey={selectedKey}
+          onSelect={(key) => {
+            setSelectedKey(key)
+            setSheetOpen(true)
+          }}
+          onToday={goToToday}
+        />
+      ) : (
+        <Agenda forecast={forecast} today={today} onEditTx={(tx) => setEditing(tx)} />
+      )}
 
       {state.transactions.length === 0 && (
         <p className="empty-hint">
@@ -183,8 +211,25 @@ export default function App() {
           onDeleteTx={deleteTransaction}
           onExport={() => exportState(state)}
           onImport={() => importRef.current?.click()}
+          onInstall={() => {
+            setMenuOpen(false)
+            setInstallOpen(true)
+          }}
           onReset={resetApp}
         />
+      )}
+
+      {installOpen && (
+        <div className="modal-backdrop" onClick={() => setInstallOpen(false)}>
+          <div className="modal install-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-head">
+              <h2>Add to Home Screen</h2>
+              <button className="icon-btn" onClick={() => setInstallOpen(false)} aria-label="Close">✕</button>
+            </div>
+            <InstallGuide />
+            <button className="btn-primary" onClick={() => setInstallOpen(false)}>Got it</button>
+          </div>
+        </div>
       )}
 
       <input

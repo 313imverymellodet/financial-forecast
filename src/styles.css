@@ -13,15 +13,15 @@
   --seg-active: #ffffff;
   --radius: 16px;
 
-  --red-bg: #fde7ea;    --red-ink: #d1425a;
-  --yellow-bg: #fdf3d6; --yellow-ink: #9a7a1e;
-  --green-bg: #dff5e6;  --green-ink: #2f9e56;
-  --blue-bg: #dcefff;   --blue-ink: #2f7fd6;
-  --purple-bg: #ecdffb; --purple-ink: #8a52d6;
-  --orange-bg: #ffe8d6; --orange-ink: #d1732f;
-  --pink-bg: #ffe0ee;   --pink-ink: #d64f96;
-  --teal-bg: #d6f5f2;   --teal-ink: #1e9a90;
-  --gray-bg: #eeeeef;   --gray-ink: #6d6d72;
+  --red-bg: #fde7ea;    --red-ink: #b62740;
+  --yellow-bg: #fdf3d6; --yellow-ink: #6d520c;
+  --green-bg: #dff5e6;  --green-ink: #1c7a40;
+  --blue-bg: #dcefff;   --blue-ink: #1f66be;
+  --purple-bg: #ecdffb; --purple-ink: #7134c0;
+  --orange-bg: #ffe8d6; --orange-ink: #a9500f;
+  --pink-bg: #ffe0ee;   --pink-ink: #bd2c78;
+  --teal-bg: #d6f5f2;   --teal-ink: #117368;
+  --gray-bg: #eeeeef;   --gray-ink: #55555a;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -87,9 +87,82 @@ html, body {
 }
 .title { font-size: 25px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; margin: 0; }
 .subtitle { color: var(--muted); font-size: 15px; margin: 2px 0 0; }
-.balance { text-align: right; padding-top: 2px; flex-shrink: 0; }
+.balance {
+  text-align: right; padding: 2px 0 0; flex-shrink: 0;
+  background: none; border: none; cursor: pointer; font: inherit; color: inherit;
+}
 .balance-amount { font-size: 23px; font-weight: 800; letter-spacing: -0.5px; }
 .balance-updated { color: var(--muted); font-size: 12px; margin-top: 2px; }
+.balance:hover .balance-updated { color: var(--blue); }
+
+/* ---------- View toggle (Calendar / Upcoming) ---------- */
+.view-toggle {
+  display: flex; background: var(--gray-bg); border-radius: 11px; padding: 3px;
+  margin: 14px 2px 4px;
+}
+.view-toggle button {
+  flex: 1; border: none; background: none; padding: 8px; border-radius: 9px;
+  font-weight: 600; font-size: 14px; cursor: pointer; color: var(--muted);
+  transition: color 0.15s;
+}
+.view-toggle button.active { background: var(--seg-active); color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,0.14); }
+
+/* ---------- Agenda / Upcoming ---------- */
+.agenda { padding: 6px 0 12px; }
+.agenda-empty { text-align: center; color: var(--muted); font-style: italic; padding: 40px 12px; }
+.agenda-day { margin-bottom: 16px; }
+.agenda-day-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  padding: 0 2px 6px; border-bottom: 1px solid var(--line); margin-bottom: 4px;
+}
+.agenda-date { font-weight: 700; font-size: 14px; }
+.agenda-bal { font-size: 13px; font-weight: 700; color: var(--muted); }
+.agenda-bal.negative { color: var(--red-ink); }
+.agenda-row {
+  display: flex; align-items: center; gap: 12px; width: 100%;
+  padding: 9px 2px; background: none; border: none; cursor: pointer;
+  font: inherit; color: inherit; text-align: left;
+}
+.agenda-row:hover { background: var(--hover); border-radius: 8px; }
+.agenda-row-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.agenda-row-title { font-weight: 600; font-size: 15px; }
+.agenda-row-sub { color: var(--muted); font-size: 12.5px; }
+.agenda-amt { font-weight: 800; font-size: 15px; }
+.agenda-amt.pos { color: var(--green-ink); }
+.agenda-amt.neg { color: var(--ink); }
+
+/* ---------- Install guide ---------- */
+.install-guide { text-align: left; margin: 4px 0 18px; }
+.ig-lead { color: var(--muted); font-size: 14.5px; line-height: 1.5; margin: 0 0 16px; text-align: center; }
+.ig-steps { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.ig-step { display: flex; align-items: center; gap: 12px; }
+.ig-step-icon {
+  flex-shrink: 0; width: 38px; height: 38px; border-radius: 10px;
+  background: var(--blue-bg); color: var(--blue-ink);
+  display: flex; align-items: center; justify-content: center;
+}
+.ig-num { font-weight: 800; font-size: 16px; }
+.ig-step-text { font-size: 14.5px; line-height: 1.4; }
+.ig-step-text strong { font-weight: 700; }
+.install-modal .btn-primary { width: 100%; margin-top: 4px; }
+
+.btn-block { width: 100%; text-align: center; }
+
+/* ---------- Motion (respects reduced-motion) ---------- */
+@media (prefers-reduced-motion: no-preference) {
+  .weather { animation: weatherIn 0.4s cubic-bezier(0.2, 0.9, 0.3, 1.2); }
+  .balance-amount { animation: pop 0.35s ease; }
+  .chip { animation: chipIn 0.25s ease both; }
+  .sparkline-svg path[stroke="currentColor"] {
+    stroke-dasharray: 1200; stroke-dashoffset: 1200;
+    animation: draw 0.9s ease forwards;
+  }
+  .agenda-day { animation: fadeUp 0.3s ease both; }
+}
+@keyframes weatherIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+@keyframes pop { 0% { transform: scale(0.9); opacity: 0.4; } 60% { transform: scale(1.04); } 100% { transform: scale(1); opacity: 1; } }
+@keyframes chipIn { from { opacity: 0; transform: scale(0.94); } to { opacity: 1; transform: none; } }
+@keyframes draw { to { stroke-dashoffset: 0; } }
 
 /* ---------- Weather banner ---------- */
 .weather {
@@ -174,6 +247,9 @@ html, body {
   line-height: 1.15; min-width: 0; overflow: hidden;
 }
 .chip-amt, .cell-num { min-width: 0; }
+/* Income gets a consistent green leading edge so money-in is scannable
+   regardless of category color. */
+.chip.income { border-left: 3px solid var(--green-ink); padding-left: 4px; }
 .chip-emoji { font-size: 13px; }
 .chip-label {
   font-size: 10.5px; font-weight: 700; white-space: nowrap;
