@@ -1,5 +1,7 @@
-// Minimal offline cache. Bump CACHE when shipping a new build.
-const CACHE = 'financial-forecast-v1'
+// Minimal offline cache. __BUILD__ is stamped with a unique id by the Vite
+// build (see vite.config.js), so every deploy gets a fresh cache and the
+// activate handler prunes the previous one automatically.
+const CACHE = 'financial-forecast-__BUILD__'
 const CORE = ['/', '/index.html', '/manifest.webmanifest', '/icon.svg', '/icon-192.png', '/icon-512.png']
 
 self.addEventListener('install', (e) => {

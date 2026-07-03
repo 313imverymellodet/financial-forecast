@@ -16,7 +16,7 @@ export default function Header({ today, balance, onMenu, onEditBalance }) {
         </div>
         <button className="balance" onClick={onEditBalance} aria-label="Edit balance">
           <div className="balance-amount" key={balance}>{formatCurrency(balance)}</div>
-          <div className="balance-updated">Balance today · Edit</div>
+          <div className="balance-updated">Starting balance · Edit</div>
         </button>
       </div>
     </header>

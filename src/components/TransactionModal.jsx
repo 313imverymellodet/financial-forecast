@@ -17,6 +17,9 @@ export default function TransactionModal({ initial, onClose, onSave, onDelete })
     e.preventDefault()
     const value = Math.abs(parseFloat(amount) || 0)
     if (value === 0) return
+    // B4: an empty date stores "" -> NaN date -> a "ghost" transaction that
+    // never lands on any day but still shows up in Settings.
+    if (!date) return
     onSave({
       id: initial.id || `t-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       category,
@@ -98,7 +101,7 @@ export default function TransactionModal({ initial, onClose, onSave, onDelete })
 
         <label className="field">
           <span>Date</span>
-          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+          <input type="date" required value={date} onChange={(e) => setDate(e.target.value)} />
         </label>
 
         <label className="field">

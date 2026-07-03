@@ -4,6 +4,7 @@ import {
 } from './lib/storage.js'
 import { buildForecast, weatherFor } from './lib/forecast.js'
 import { startOfDay, dayKey } from './lib/date.js'
+import { CATEGORIES } from './lib/categories.js'
 import Header from './components/Header.jsx'
 import WeatherBanner from './components/WeatherBanner.jsx'
 import Calendar from './components/Calendar.jsx'
@@ -19,8 +20,10 @@ const FORECAST_DAYS = 120
 
 export default function App() {
   const [state, setState] = useState(loadState)
-  const today = useMemo(() => startOfDay(new Date()), [])
-  const [selectedKey, setSelectedKey] = useState(dayKey(today))
+  const [today, setToday] = useState(() => startOfDay(new Date()))
+  const [selectedKey, setSelectedKey] = useState(() => dayKey(today))
+  const todayRef = useRef(today)
+  todayRef.current = today
   const [viewMonth, setViewMonth] = useState({ year: today.getFullYear(), month: today.getMonth() })
 
   const [sheetOpen, setSheetOpen] = useState(false)
@@ -31,6 +34,24 @@ export default function App() {
   const importRef = useRef(null)
 
   useEffect(() => saveState(state), [state])
+
+  // B1: refresh "today" when the app wakes on a new day — installed PWAs stay
+  // in memory across midnights, and everything anchors to this date.
+  useEffect(() => {
+    function refresh() {
+      const now = startOfDay(new Date())
+      if (now.getTime() === todayRef.current.getTime()) return
+      const prevKey = dayKey(todayRef.current)
+      setToday(now)
+      setSelectedKey((k) => (k === prevKey ? dayKey(now) : k))
+    }
+    window.addEventListener('focus', refresh)
+    document.addEventListener('visibilitychange', refresh)
+    return () => {
+      window.removeEventListener('focus', refresh)
+      document.removeEventListener('visibilitychange', refresh)
+    }
+  }, [])
 
   // Escape closes the top-most layer.
   useEffect(() => {
@@ -50,7 +71,8 @@ export default function App() {
     [state.balance, state.transactions, today]
   )
   const weather = useMemo(() => weatherFor(forecast), [forecast])
-  const sparkSeries = useMemo(() => [...forecast.values()].slice(0, 45), [forecast])
+  // B6: chart the same window the weather banner scans, so the two never disagree.
+  const sparkSeries = useMemo(() => [...forecast.values()], [forecast])
 
   function completeOnboarding({ balance, withSample }) {
     setState({
@@ -72,8 +94,20 @@ export default function App() {
     })
   }
 
+  // B2: recurring rows look like "remove from this day" but delete the whole
+  // series — confirm with recurrence-aware copy. Returns false on cancel so
+  // callers (the edit modal) can stay open.
   function deleteTransaction(id) {
+    const tx = state.transactions.find((t) => t.id === id)
+    if (!tx) return false
+    const label = tx.label || (CATEGORIES[tx.category] || CATEGORIES.other).label
+    const msg =
+      tx.recurrence === 'once'
+        ? `Delete "${label}"?`
+        : `"${label}" repeats — deleting it removes every occurrence from the forecast. Delete it?`
+    if (!confirm(msg)) return false
     setState((s) => ({ ...s, transactions: s.transactions.filter((t) => t.id !== id) }))
+    return true
   }
 
   function setBalance(balance) {
@@ -191,8 +225,7 @@ export default function App() {
           onDelete={
             editing.id
               ? () => {
-                  deleteTransaction(editing.id)
-                  setEditing(null)
+                  if (deleteTransaction(editing.id)) setEditing(null)
                 }
               : null
           }

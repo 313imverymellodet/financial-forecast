@@ -43,7 +43,8 @@ export default function Onboarding({ onComplete }) {
           <div className="onboard-hero">💵</div>
           <h1 className="onboard-title">What's your balance today?</h1>
           <p className="onboard-sub">
-            Your current account balance. Everything you forecast builds from here.
+            Your account balance before today's scheduled money moves — anything
+            you schedule for today still counts on top of this.
           </p>
           <div className="amount-input onboard-amount">
             <span className="amount-sign">$</span>

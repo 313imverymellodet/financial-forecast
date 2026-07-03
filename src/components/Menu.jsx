@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { CATEGORIES, RECURRENCE } from '../lib/categories.js'
 import { formatSigned } from '../lib/format.js'
 import { isStandalone } from '../lib/platform.js'
@@ -8,9 +8,17 @@ export default function Menu({
 }) {
   const [draft, setDraft] = useState(String(state.balance))
 
-  function commitBalance() {
+  // B3: commit on blur AND on unmount — Esc/backdrop closes the drawer without
+  // firing blur, which used to silently discard a typed balance.
+  const commitRef = useRef(() => {})
+  commitRef.current = () => {
     const v = parseFloat(draft)
-    if (!Number.isNaN(v)) onSetBalance(v)
+    if (Number.isFinite(v) && v !== state.balance) onSetBalance(v)
+  }
+  useEffect(() => () => commitRef.current(), [])
+
+  function commitBalance() {
+    commitRef.current()
   }
 
   function confirmReset() {
@@ -26,7 +34,7 @@ export default function Menu({
         </div>
 
         <div className="field">
-          <span>Current balance</span>
+          <span>Starting balance (before today's scheduled items)</span>
           <div className="amount-input">
             <span className="amount-sign">$</span>
             <input

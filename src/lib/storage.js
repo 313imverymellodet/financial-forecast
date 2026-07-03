@@ -83,7 +83,9 @@ export function parseImport(text) {
     throw new Error('Not a Financial Forecast backup file.')
   }
   const transactions = data.transactions
-    .filter((t) => t && typeof t.amount === 'number' && typeof t.date === 'string')
+    // Number.isFinite (not typeof): NaN/Infinity are "number" and would poison
+    // every running balance in the forecast.
+    .filter((t) => t && Number.isFinite(t.amount) && typeof t.date === 'string' && t.date)
     .map((t) => ({
       id: t.id || `t-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
       category: t.category || 'other',
@@ -94,6 +96,6 @@ export function parseImport(text) {
         ? t.recurrence
         : 'once',
     }))
-  const balance = typeof data.balance === 'number' ? data.balance : 0
+  const balance = Number.isFinite(data.balance) ? data.balance : 0
   return { balance, transactions }
 }
